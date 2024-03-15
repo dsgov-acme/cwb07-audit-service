@@ -1,0 +1,8 @@
+# Create a list of all the declared env variables in values.ENV.yaml files.
+# These are intended to be set for the app container to reduce deployment.yaml clutter.
+{{- define "env.tpl" }}
+{{- range $key, $value := . }}
+- name: {{ $key }}
+  value: {{ $value | quote }}
+{{- end }}
+{{- end }}

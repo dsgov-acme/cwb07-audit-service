@@ -1,0 +1,105 @@
+/**
+ * REQUIRES PLUGINS: checkstyle, spotless, jacoco, spotbugs, pmd
+ */
+
+/**
+ * code style
+ */
+
+checkstyle {
+    toolVersion '10.12.4'
+}
+
+spotless {
+    java {
+        googleJavaFormat('1.15.0').aosp()
+        toggleOffOn('/**', '*/') // don't reformat javadocs
+        importOrder('', 'java', 'javax')
+        targetExclude('**/generate-resources/**')
+    }
+}
+
+/**
+ * code coverage
+ */
+jacoco {
+    toolVersion = "0.8.10"
+}
+
+test.finalizedBy jacocoTestReport
+
+def excludeGenerated(ConfigurableFileCollection collection) {
+    collection.setFrom(files(collection.files.collect {
+        fileTree(dir: it.absolutePath, exclude: ['**/generated/**', '**/RFC3339DateFormat.class', '**/OpenAPI2SpringBoot*.class'])
+    }))
+}
+
+jacocoTestReport {
+    dependsOn test
+
+    afterEvaluate {
+        excludeGenerated(classDirectories)
+    }
+}
+
+jacocoTestCoverageVerification {
+    afterEvaluate {
+        excludeGenerated(classDirectories)
+    }
+
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.90
+            }
+        }
+    }
+}
+
+check.dependsOn jacocoTestCoverageVerification
+
+/**
+ * static code analysis
+ */
+
+spotbugs {
+    ignoreFailures = false
+    showStackTraces = true
+    showProgress = true
+    effort = 'max'
+    reportLevel = 'high'
+    reportsDir = file("$buildDir/spotbugs") as Directory
+    excludeFilter = file("${rootDir}/config/spotbugs/excludes.xml")
+    maxHeapSize = '1g'
+}
+
+pmd {
+    ruleSets = ["${rootDir}/config/pmd/ruleset.xml"]
+    ignoreFailures = false
+    pmdMain {
+        source = fileTree('src/main')
+    }
+    pmdTest {
+        source = fileTree('src/test')
+    }
+}
+
+/**
+ * security
+ */
+
+apply plugin: 'org.owasp.dependencycheck'
+
+dependencyCheck {
+    failBuildOnCVSS = 7
+    skipConfigurations = [
+            'checkstyle',
+            'pmd',
+            'spotbugs',
+            'testCompileClasspath',
+            'testRuntimeClasspath',
+            'functionalTestCompileClasspath',
+            'functionalTestRuntimeClasspath'
+    ]
+    suppressionFile = "${rootDir}/config/owasp/suppressions.xml"
+}

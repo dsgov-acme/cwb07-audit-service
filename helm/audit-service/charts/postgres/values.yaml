@@ -1,0 +1,6 @@
+repo:
+  name: audit-service
+
+persistence:
+  enabled: false
+  size: 1Gi

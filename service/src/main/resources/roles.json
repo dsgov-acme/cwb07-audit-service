@@ -1,0 +1,23 @@
+{
+  "name": "audit-service",
+  "roles": [
+    {
+      "applicationRole": "as:event-reporter",
+      "name": "Event Reporter",
+      "description": "Can submit audit events to the system.",
+      "group": "audit-service"
+    },
+    {
+      "applicationRole": "as:event-reader",
+      "name": "Event Reader",
+      "description": "Can query / view audit events.",
+      "group": "audit-service"
+    },
+    {
+      "applicationRole": "as:profile-event-reader",
+      "name": "Profile Event Reader",
+      "description": "Can query / view audit events belonging to linked profiles.",
+      "group": "audit-service"
+    }
+  ]
+}

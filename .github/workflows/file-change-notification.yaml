@@ -1,0 +1,25 @@
+name: File Change Notification
+
+on:
+  ## push_request and pull_request are both covered by the python script
+  push:
+    branches:    
+      - main
+    paths:
+      - 'skaffold.yaml'
+      - 'helm/audit-service/values.demo.yaml'
+      - 'helm/audit-service/values.dev.yaml'
+      - 'helm/audit-service/values.local.yaml'
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Notify on File Change
+      run: python .github/scripts/notify_on_file_change.py
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.DSGOV_SLACK_WEBHOOK }}
