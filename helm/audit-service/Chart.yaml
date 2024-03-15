@@ -1,0 +1,11 @@
+apiVersion: v2
+name: audit-service
+description: Helm Chart for Audit Service
+type: application
+version: 0.0.1
+appVersion: "0.0.1"
+
+dependencies:
+  - name: postgres
+    version: 0.0.1
+    condition: postgres.enabled

@@ -1,0 +1,53 @@
+namespace: "cwb07"
+
+postgres:
+  enabled: false
+  namespace: "cwb07"
+  persistence:
+    size: 1Gi
+  env:
+    POSTGRES_DB: "local-audit-service-db"
+    POSTGRES_HOST: 'postgres-14-alpine'
+    POSTGRES_PASSWORD: "root"
+    POSTGRES_PORT: 5432
+    POSTGRES_USER: "root"
+
+replicaCount: 1
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 50
+  targetMemoryUtilizationPercentage: 80
+
+resources:
+  auditService:
+    requests:
+      cpu: 100m
+      memory: 512Mi
+    limits:
+      memory: 1024Mi
+  cerbos:
+    requests:
+      cpu: 100m
+      memory: 512Mi
+    limits:
+      memory: 1024Mi
+
+image:
+  pullPolicy: "IfNotPresent"
+  repository: "audit-service"
+  tag: "latest"
+
+net:
+  applicationPort: 8080
+  servicePort: 80
+  contextPath: "/as"
+  readinessProbe:
+    path: "/actuator/health"
+    initialDelaySeconds: 60
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 1
+    failureThreshold: 10

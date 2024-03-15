@@ -1,0 +1,10 @@
+events:
+  subscriber:
+    subscriptions:
+      - AUDIT_EVENTS_RECORDING
+    topics:
+      - AUDIT_EVENTS_RECORDING_SUBSCRIPTION
+  publisher:
+    topics:
+      - AUDIT_EVENTS_RECORDING
+      - APPLICATION_ROLE_REPORTING

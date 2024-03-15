@@ -1,0 +1,109 @@
+plugins {
+	id 'org.springframework.boot' version '3.1.3'
+	id 'io.spring.dependency-management' version '1.1.3'
+	id 'java'
+	id 'com.google.cloud.tools.jib'
+	id 'checkstyle'
+	id 'jacoco'
+	id 'com.github.spotbugs'
+	id 'pmd'
+	id 'com.diffplug.spotless'
+	id 'org.sonarqube'
+}
+
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
+
+apply from: "${rootDir}/gradle/openapi-tools/server.gradle"
+apply from: "${rootDir}/gradle/code-quality.gradle"
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+	maven {
+		url 'https://oss.sonatype.org/service/local'
+	}
+	maven {
+		url 'https://oss.sonatype.org/content/repositories/snapshots/'
+	}
+}
+
+//def mapstructVersion = '1.4.2.Final'
+def mapstructVersion = '1.5.5.Final'
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.liquibase:liquibase-core'
+	runtimeOnly 'org.postgresql:postgresql:42.6.0'
+	implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+	implementation 'io.nuvalence.dsgov:dsgov-auth:1.1.15'
+	implementation 'io.nuvalence.dsgov:dsgov-logging:1.0.0'
+	implementation 'io.nuvalence.dsgov:dsgov-events:1.1.5'
+
+	annotationProcessor 'org.projectlombok:lombok'
+	annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+	annotationProcessor('org.hibernate.orm:hibernate-jpamodelgen')
+	compileOnly 'com.google.code.findbugs:annotations:3.0.1'
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.assertj:assertj-core:3.24.2'
+	testRuntimeOnly 'com.h2database:h2:2.2.222'
+	implementation 'org.springframework.integration:spring-integration-core'
+	implementation 'com.google.cloud:spring-cloud-gcp-starter-secretmanager:4.7.2'
+
+	implementation 'com.google.protobuf:protobuf-java:3.24.3'
+	implementation 'com.google.protobuf:protobuf-java-util:3.24.3'
+	implementation 'io.grpc:grpc-protobuf:1.58.0'
+	implementation 'io.grpc:grpc-stub:1.58.0'
+	implementation 'io.grpc:grpc-grpclb:1.58.0'
+	implementation 'io.grpc:grpc-auth:1.58.0'
+	implementation 'io.grpc:grpc-alts:1.58.0'
+
+	//cloud trace
+	//implementation 'com.google.cloud:spring-cloud-gcp-starter-trace:2.0.11'
+	//implementation 'com.google.cloud:spring-cloud-gcp-starter-trace:4.7.2'
+}
+
+tasks.withType(JavaCompile) {
+	options.compilerArgs = [
+			'-Amapstruct.suppressGeneratorTimestamp=true', '-parameters'
+	]
+}
+
+test {
+	useJUnitPlatform()
+	testLogging.showStandardStreams = true
+	// Required variables to pass PubSubConfigLocalTest
+	environment 'PUB_SUB_TOPIC', 'topic'
+	environment 'ENABLE_PUB_SUB', 'false'
+	environment 'PUB_SUB_TOPIC_SUBSCRIPTION', 'subscription'
+}
+
+jacocoTestReport {
+	reports {
+		xml.required = true
+		html.required = true
+	}
+}
+
+sonarqube {
+	properties {
+		property 'sonar.dependencyCheck.htmlReportPath', 'build/reports/dependency-check-report.html'
+		property 'sonar.dependencyCheck.jsonReportPath', 'build/reports/dependency-check-report.json'
+		property 'sonar.dependencyCheck.summarize', true
+	}
+}
+
+test.finalizedBy jacocoTestReport
+tasks.named('sonarqube').configure {
+	dependsOn test
+}
