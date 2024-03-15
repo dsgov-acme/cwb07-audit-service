@@ -21,9 +21,9 @@ env:
   DB_CONNECTION_URL: "jdbc:postgresql://audit-service-postgres:5432/local-audit-service-db"
   DB_USERNAME: "root"
   DB_PASSWORD: "root"
-  GCP_PROJECT_ID: "cwb07-dev"
-  SELF_SIGN_PUBLIC_KEY: "${sm://projects/cwb07-dev/secrets/cwb07-self-signed-token-public-key/versions/latest}"
-  SELF_SIGN_PRIVATE_KEY: "${sm://projects/cwb07-dev/secrets/cwb07-self-signed-token-private-key/versions/latest}"
+  GCP_PROJECT_ID: "cwb07-dev-ac55"
+  SELF_SIGN_PUBLIC_KEY: "${sm://projects/cwb07-dev-ac55/secrets/cwb07-self-signed-token-public-key/versions/latest}"
+  SELF_SIGN_PRIVATE_KEY: "${sm://projects/cwb07-dev-ac55/secrets/cwb07-self-signed-token-private-key/versions/latest}"
   PUB_SUB_TOPIC: topic-audit-events
   PUB_SUB_TOPIC_SUBSCRIPTION: sub-audit-events
   TOKEN_PRIVATE_KEY_SECRET: "cwb07-self-signed-token-private-key"
@@ -32,8 +32,8 @@ env:
   OTEL_SAMPLER_PROBABILITY: 1.0 # valid values: [0.0 - 1.0]
   PUBSUB_EMULATOR_HOST: "pubsub-emulator-service:8085" # set actual "host:port" to enable or false to disable
   PUBSUB_EMULATOR_ENABLED: true # set to true to enable emulator
-  PUBSUB_SUBSCRIPTIONS: "projects/cwb07-dev/subscriptions/AUDIT_EVENTS_RECORDING_SUBSCRIPTION" # subscriptions separated by comma
+  PUBSUB_SUBSCRIPTIONS: "projects/cwb07-dev-ac55/subscriptions/AUDIT_EVENTS_RECORDING_SUBSCRIPTION" # subscriptions separated by comma
   # cwb07-events publisher topics separated by comma
   SUBSCRIBER_TOPICS: "AUDIT_EVENTS_RECORDING"
-  PUBLISHER_TOPICS: projects/cwb07-dev/topics/APPLICATION_ROLE_REPORTING,projects/cwb07-dev/topics/AUDIT_EVENTS_RECORDING
+  PUBLISHER_TOPICS: projects/cwb07-dev-ac55/topics/APPLICATION_ROLE_REPORTING,projects/cwb07-dev-ac55/topics/AUDIT_EVENTS_RECORDING
   FIREBASE_AUTH_EMULATOR_HOST: "audit-service-firebase-emulator:9099"
