@@ -48,34 +48,13 @@ steps:
 
         EXIT=$?
         echo "Build exited with status code $$EXIT"
-    
+
         kill $$PID
-    
+
         ## Fail code needs to be the last step in the ID.
         ## Moving an escape check to the end of the ID.
-    
+
         if [[ $$EXIT > 0 ]]; then
           exit 1
         fi
 
-
-  - id: 'build'
-    name: "${_GAR_BUILDER_URL}/helm:4.0.0"
-    entrypoint: bash
-    args:
-      - "-c"
-      - |
-        skaffold build -p dev --interactive=false --file-output=/workspace/artifacts.json
-
-  - id: "Cloud Deploy Release"
-    name: "google/cloud-sdk"
-    entrypoint: bash
-    args:
-      - "-c"
-      - |
-        gcloud deploy releases create "$(echo ${REPO_NAME} | cut -d- -f2-)-${SHORT_SHA}" \
-          --project=$PROJECT_ID \
-          --region=${_DEPLOY_REGION} \
-          --delivery-pipeline=${REPO_NAME} \
-          --gcs-source-staging-dir=gs://${_CLOUD_DEPLOY_SOURCE_BUCKET}/source \
-          --build-artifacts=/workspace/artifacts.json
